@@ -51,6 +51,7 @@ func OnSessionLeave(sid wamp.ID) {
 }
 
 func RunNew(instance, id string, width uint16, height uint16, caller wamp.ID) error {
+	util.Log.Debugf("Starting tui %s.%s with w=%d, h=%d for caller %d", instance, id, width, height, caller)
 	if _, ok := processes[id]; ok {
 		return errors.New("already exists")
 	}
