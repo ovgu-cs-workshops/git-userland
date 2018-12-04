@@ -13,7 +13,7 @@ LABEL service "${APP_NAME}"
 LABEL vendor "EmbeddedEnterprises"
 LABEL product "robµlab"
 LABEL maintainers "Martin Koppehel <mkoppehel@embedded.enterprises>"
-RUN apt update && apt install -yq zsh git tmux vim emacs-nox tig curl wget nano less locales
+RUN apt update && apt install -yq zsh git tmux vim emacs-nox tig nano less locales man patch 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen
 RUN groupadd -g 1000 user
