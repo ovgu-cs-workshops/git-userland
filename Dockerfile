@@ -18,7 +18,7 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen
 RUN groupadd -g 1000 user
 RUN useradd -d /home/user -g 1000 -u 1000 -o -m -s /bin/zsh user
-RUN su user -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"'
+RUN apt install curl -yq && su user -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"' && apt remove curl -yq && apt autoremove -yq
 
 COPY --from=builder /bin/git-userland /bin/git-userland
 USER user

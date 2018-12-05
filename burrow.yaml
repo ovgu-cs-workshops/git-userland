@@ -1,5 +1,5 @@
 name: git-userland
-version: 0.1.2
+version: 0.1.3
 description: Userland container for git workshop
 authors:
 - Martin Koppehel
