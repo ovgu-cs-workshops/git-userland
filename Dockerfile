@@ -22,5 +22,7 @@ RUN apt install curl -yq && su user -c 'sh -c "$(curl -fsSL https://raw.githubus
 
 COPY --from=builder /bin/git-userland /bin/git-userland
 USER user
+WORKDIR /home/user
+RUN git init --bare .remote
 ENTRYPOINT ["/bin/git-userland"]
 CMD []
