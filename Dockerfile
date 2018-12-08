@@ -13,7 +13,7 @@ LABEL service "${APP_NAME}"
 LABEL vendor "EmbeddedEnterprises"
 LABEL product "robµlab"
 LABEL maintainers "Martin Koppehel <mkoppehel@embedded.enterprises>"
-RUN apt update && apt install -yq zsh git tmux vim emacs-nox tig nano less locales man patch 
+RUN apt update && apt install -yq zsh git tmux vim emacs-nox tig nano less locales man patch
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen
 RUN groupadd -g 1000 user
@@ -23,6 +23,7 @@ RUN apt install curl -yq && su user -c 'sh -c "$(curl -fsSL https://raw.githubus
 COPY --from=builder /bin/git-userland /bin/git-userland
 USER user
 WORKDIR /home/user
-RUN git init --bare .remote
+ADD ./setup-userland.sh .
+RUN sh ./setup-userland.sh && rm ./setup-userland.sh
 ENTRYPOINT ["/bin/git-userland"]
 CMD []
