@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 	"syscall"
 
 	"github.com/EmbeddedEnterprises/service"
@@ -27,9 +28,11 @@ type processBag struct {
 }
 
 var processes map[string]*processBag
+var procLock sync.Mutex
 var shell string
 
 func init() {
+	procLock = sync.Mutex{}
 	processes = map[string]*processBag{}
 	if sh, ok := os.LookupEnv("USERSHELL"); ok {
 		shell = sh
@@ -39,18 +42,24 @@ func init() {
 }
 
 func Shutdown() {
+	procLock.Lock()
 	for _, process := range processes {
 		process.kill()
 	}
+	procLock.Unlock()	
 }
 
 func OnSessionLeave(sid wamp.ID) {
+	procLock.Lock()
 	for _, p := range processes {
 		p.onSessionLeave(sid)
 	}
+	procLock.Unlock()
 }
 
 func RunNew(instance, id string, width uint16, height uint16, caller wamp.ID) error {
+	procLock.Lock()
+	defer procLock.Unlock()
 	util.Log.Debugf("Starting tui %s.%s with w=%d, h=%d for caller %d", instance, id, width, height, caller)
 	if _, ok := processes[id]; ok {
 		return errors.New("already exists")
@@ -106,6 +115,7 @@ func (p *processBag) monitorOutput() {
 		n, err := p.ptmx.Read(data)
 		if err != nil {
 			util.Log.Warningf("Failed to read the stream: %v", err)
+
 			break
 		}
 
@@ -123,6 +133,8 @@ func (p *processBag) monitorOutput() {
 
 func (p *processBag) monitorExit() {
 	err := p.cmd.Wait()
+	procLock.Lock()
+	defer procLock.Unlock()
 	p.exited = true
 	util.Log.Debugf("p.cmd.Wait(%s): %v", p.id, err)
 	util.App.Client.Publish(fmt.Sprintf("rocks.git.tui.%s.%s.exit", p.instance, p.id), wamp.Dict{
