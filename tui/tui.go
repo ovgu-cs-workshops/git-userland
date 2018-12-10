@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/EmbeddedEnterprises/service"
 	"github.com/gammazero/nexus/client"
@@ -25,6 +26,7 @@ type processBag struct {
 	cmd           *exec.Cmd
 	exited        bool
 	caller        wamp.ID
+	done 	      chan struct{}
 }
 
 var processes map[string]*processBag
@@ -42,19 +44,15 @@ func init() {
 }
 
 func Shutdown() {
-	procLock.Lock()
 	for _, process := range processes {
 		process.kill()
 	}
-	procLock.Unlock()
 }
 
 func OnSessionLeave(sid wamp.ID) {
-	procLock.Lock()
 	for _, p := range processes {
 		p.onSessionLeave(sid)
 	}
-	procLock.Unlock()
 }
 
 func RunNew(instance, id string, width uint16, height uint16, caller wamp.ID) error {
@@ -88,6 +86,7 @@ func RunNew(instance, id string, width uint16, height uint16, caller wamp.ID) er
 		cmd:      c,
 		exited:   false,
 		caller:   caller,
+		done:     make(chan struct{}),
 	}
 	go bag.monitorExit()
 	go bag.monitorOutput()
@@ -134,6 +133,7 @@ func (p *processBag) monitorOutput() {
 func (p *processBag) monitorExit() {
 	err := p.cmd.Wait()
 	procLock.Lock()
+	close(p.done)
 	defer procLock.Unlock()
 	p.exited = true
 	util.Log.Debugf("p.cmd.Wait(%s): %v", p.id, err)
@@ -209,7 +209,41 @@ func (p *processBag) kill() {
 	if p.exited {
 		return
 	}
+	util.Log.Debugf("Sending sigint to %s", p.id)
+	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGINT); err != nil {
+		util.Log.Warningf("Failed to int session %s", p.id)
+	}
+	select {
+		case <-p.done:
+			return
+		case <-time.After(1 * time.Second):
+	}
+	util.Log.Debugf("Sending sigterm to %s", p.id)
+	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGTERM); err != nil {
+		util.Log.Warningf("Failed to term session %s", p.id)
+	}
+	select {
+		case <-p.done:
+			return
+		case <-time.After(1 * time.Second):
+	}
+	util.Log.Debugf("Sending sigquit to %s", p.id)
 	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGQUIT); err != nil {
+		util.Log.Warningf("Failed to quit session %s", p.id)
+	}
+	select {
+		case <-p.done:
+			return
+		case <-time.After(1 * time.Second):
+	}
+	util.Log.Debugf("Sending sigkill to %s", p.id)
+	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGKILL); err != nil {
 		util.Log.Warningf("Failed to kill session %s", p.id)
 	}
+	select {
+		case <-p.done:
+			return
+		case <-time.After(1 * time.Second):
+	}
+	util.Log.Errorf("Failed to kill tui: %s", p.id)
 }
