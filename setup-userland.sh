@@ -13,7 +13,10 @@ git init --bare .remote-example-101
 git init --bare .remote-example-102
 git init --bare .remote-example-300
 
+git init --bare .remote-exmaple-201
+
 git clone /home/user/.remote-example-100 example-100-tmp
+
 (
     cd example-100-tmp
 
@@ -172,6 +175,63 @@ Water is great. But when there is no water it is not great. There was once a wat
 The end.
 EOF
 )
+
+git clone /home/user/.remote-example-201 example-201-tmp
+(
+    cd example-201-tmp
+
+    cat > README.md <<EOF
+# This project contains a sequel to the ship
+
+The story is located in \`the-ship-2.md\`.
+EOF
+
+    git add README.md
+    git commit -m "Initial commit"
+    git push origin master
+
+    git branch development
+    git checkout development
+
+    cat > the-ship-2.md <<EOF
+# The Ship 2 - The Next Generation
+
+In a not so far future there is a ship in space.
+The ship is quite fast.
+Now it is over there.
+
+__fin__
+EOF
+
+    git add the-ship-2.md
+    git commit -m "Add introduction
+
+This should really be the content of a TV series. Might do that later"
+
+    git push --set-upstream origin development
+    git branch feature/second-chapter
+    git checkout feature/second-chapter
+    git push --set-upstream origin feature/second-chapter
+
+    git checkout development
+    git branch fix/ending
+    git checkout fix/ending
+
+    sed -i 's/__fin__/__The End__/g' the-ship-2.md
+    git add -A
+    git commit -m "Fix ending sentence
+
+Our publisher said we cannot use french."
+    git push --set-upstream origin fix/ending
+
+    git checkout development
+    git merge fix/ending
+
+    cd ..
+)
+
+rm -r example-201-tmp
+git clone /home/user/.remote-example-201 example-201
 
 git config --global --unset-all user.email
 git config --global --unset-all user.name
