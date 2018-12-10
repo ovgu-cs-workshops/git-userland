@@ -11,6 +11,7 @@ git init --bare .remote
 git init --bare .remote-example-100
 git init --bare .remote-example-101
 git init --bare .remote-example-102
+git init --bare .remote-example-300
 
 git clone /home/user/.remote-example-100 example-100-tmp
 (
@@ -127,6 +128,46 @@ rm -r example-102-tmp
 # The story of the ship
 
 Once upon a time there was a blue ship on the sea.
+
+The end.
+EOF
+)
+
+git clone /home/user/.remote-example-300 example-300-tmp
+(
+    cd example-300-tmp
+
+    cat > README.md <<EOF
+# A whole new story
+
+Let's write about water bottles! The story is located in \`water-bottles.md\`.
+EOF
+    git add README.md
+    git commit -m "Add README.md with project description
+
+The readme tells the user where the story is located."
+
+    git push
+    git clone /home/user/.remote-example-300 ~/example-300
+
+    cat >> README.md <<EOF
+
+> For other stories please add new files.
+EOF
+    git add README.md
+    git commit -m "Add note to README.md
+
+Users should add new files for new stories."
+    git push
+)
+rm -r example-300-tmp
+(
+    cd example-300
+
+    cat > water-bottles.md <<EOF
+# The story of the water bottle
+
+Water is great. But when there is no water it is not great. There was once a water bottle without water. Someone filled it with water. The water bottle was happy again.
 
 The end.
 EOF
