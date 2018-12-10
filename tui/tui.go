@@ -26,7 +26,7 @@ type processBag struct {
 	cmd           *exec.Cmd
 	exited        bool
 	caller        wamp.ID
-	done 	      chan struct{}
+	done          chan struct{}
 }
 
 var processes map[string]*processBag
@@ -214,36 +214,36 @@ func (p *processBag) kill() {
 		util.Log.Warningf("Failed to int session %s", p.id)
 	}
 	select {
-		case <-p.done:
-			return
-		case <-time.After(1 * time.Second):
+	case <-p.done:
+		return
+	case <-time.After(1 * time.Second):
 	}
 	util.Log.Debugf("Sending sigterm to %s", p.id)
 	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGTERM); err != nil {
 		util.Log.Warningf("Failed to term session %s", p.id)
 	}
 	select {
-		case <-p.done:
-			return
-		case <-time.After(1 * time.Second):
+	case <-p.done:
+		return
+	case <-time.After(1 * time.Second):
 	}
 	util.Log.Debugf("Sending sigquit to %s", p.id)
 	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGQUIT); err != nil {
 		util.Log.Warningf("Failed to quit session %s", p.id)
 	}
 	select {
-		case <-p.done:
-			return
-		case <-time.After(1 * time.Second):
+	case <-p.done:
+		return
+	case <-time.After(1 * time.Second):
 	}
 	util.Log.Debugf("Sending sigkill to %s", p.id)
 	if err := syscall.Kill(p.cmd.Process.Pid, syscall.SIGKILL); err != nil {
 		util.Log.Warningf("Failed to kill session %s", p.id)
 	}
 	select {
-		case <-p.done:
-			return
-		case <-time.After(1 * time.Second):
+	case <-p.done:
+		return
+	case <-time.After(1 * time.Second):
 	}
 	util.Log.Errorf("Failed to kill tui: %s", p.id)
 }
