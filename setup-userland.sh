@@ -11,9 +11,9 @@ git init --bare .remote
 git init --bare .remote-example-100
 git init --bare .remote-example-101
 git init --bare .remote-example-102
+git init --bare .remote-example-201
 git init --bare .remote-example-300
 
-git init --bare .remote-exmaple-201
 
 git clone /home/user/.remote-example-100 example-100-tmp
 
