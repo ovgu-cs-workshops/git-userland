@@ -226,6 +226,7 @@ Our publisher said we cannot use french."
 
     git checkout development
     git merge fix/ending
+    git push --set-upstream origin development
 
     cd ..
 )
