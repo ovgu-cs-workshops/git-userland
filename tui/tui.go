@@ -46,7 +46,7 @@ func Shutdown() {
 	for _, process := range processes {
 		process.kill()
 	}
-	procLock.Unlock()	
+	procLock.Unlock()
 }
 
 func OnSessionLeave(sid wamp.ID) {
