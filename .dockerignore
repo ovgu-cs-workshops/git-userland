@@ -1,3 +1,4 @@
 # Clean-slate docker build
 *
 !setup-userland.sh
+!bashrc
