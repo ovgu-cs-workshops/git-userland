@@ -1,9 +1,12 @@
-FROM embeddedenterprises/burrow as builder
-RUN apk update && apk add build-base
-RUN burrow clone https://github.com/ovgu-cs-workshops/git-userland.git
-WORKDIR $GOPATH/src/github.com/ovgu-cs-workshops/git-userland
-RUN burrow e && burrow b
-RUN cp bin/git-userland /bin
+FROM golang:1.12-alpine as builder
+RUN apk update && apk add build-base git
+WORKDIR /app
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+COPY . .
+RUN GOOS=linux GOARCH=amd64 go build -ldflags '-linkmode=external "-extldflags=-static"'
+RUN cp git-userland /bin
 
 FROM debian:stretch
 ARG APP_VERSION

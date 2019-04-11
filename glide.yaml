@@ -1,6 +1,0 @@
-package: github.com/ovgu-cs-workshops/git-userland
-import:
-- package: github.com/EmbeddedEnterprises/service
-  version: ^0.17.0
-- package: github.com/kr/pty
-  version: ^1.1.3
