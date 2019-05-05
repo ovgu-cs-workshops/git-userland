@@ -25,9 +25,10 @@ RUN apt update && apt install -y zsh git tmux vim emacs-nox tig nano less patch 
 RUN apt install curl -y && su user -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"' && sed -i s/robbyrussel/bira/g /home/user/.zshrc && apt remove curl -y && apt autoremove -y
 
 COPY --from=builder /bin/git-userland /bin/git-userland
-USER user
+
 WORKDIR /home/user
-ADD ./setup-userland.sh .
-RUN sh ./setup-userland.sh && rm ./setup-userland.sh
-ENTRYPOINT ["/bin/git-userland"]
-CMD []
+ADD ./setup-userland.sh /setup-userland.sh
+ADD ./start-userland.sh /start-userland.sh
+
+ENTRYPOINT ["sh"]
+CMD ["/start-userland.sh"]

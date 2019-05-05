@@ -4,6 +4,8 @@ set -e
 
 cd /home/user
 
+touch .initializedHome
+
 git config --global user.email "holy@admin.rocks"
 git config --global user.name "Holy Admin"
 
