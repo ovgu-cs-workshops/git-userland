@@ -16,7 +16,7 @@ RUN locale-gen
 RUN groupadd -g 1000 user
 RUN useradd -d /home/user -g 1000 -u 1000 -o -m -s /bin/zsh user
 RUN apt update && apt install -y zsh git tmux vim emacs-nox tig nano less patch git-man gnupg2
-RUN apt install curl -y && su user -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"' && sed -i s/robbyrussell/bira/g /home/user/.zshrc && apt remove curl -y && apt autoremove -y
+RUN apt install curl -y && su user -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"' && sed -i s/robbyrussell/gianu/g /home/user/.zshrc && apt remove curl -y && apt autoremove -y
 
 COPY --from=builder /bin/git-userland /bin/git-userland
 
