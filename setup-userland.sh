@@ -238,3 +238,6 @@ git clone /home/user/.remote-example-201 example-201
 
 git config --global --unset-all user.email
 git config --global --unset-all user.name
+
+# Set nano as default git editor with automatic linewrapping
+git config --global core.editor "nano -r 70 -b"
