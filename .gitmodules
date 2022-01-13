@@ -1,0 +1,3 @@
+[submodule "go-k8s-userland"]
+	path = go-k8s-userland
+	url = ../go-k8s-userland.git
